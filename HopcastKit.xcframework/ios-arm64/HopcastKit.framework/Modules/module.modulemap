@@ -1,0 +1,4 @@
+framework module HopcastKit {
+  header "HopcastKit-Swift.h"
+  requires objc
+}

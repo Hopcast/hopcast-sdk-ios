@@ -1,0 +1,366 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 54;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		25A1092DD31BD2C065055072 /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ECA705431E993CAF64AB076 /* JournalView.swift */; };
+		2A9B1D1C34453DF86126F674 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD1A1DFCDE350AEEAB78F91 /* DashboardView.swift */; };
+		2DD5A995B8E3A7E8196EFB7D /* HopcastController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23A22489D387F6A10F8E3248 /* HopcastController.swift */; };
+		65ADAD16A8286AA359F1602A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7010E01BAE4E51FA83DFB42F /* SettingsView.swift */; };
+		89B15969C3464882A0782EC1 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24407A687EDF6BEA0DF442B3 /* App.swift */; };
+		8CB4CBCE945126F6C3814365 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A991C82BB2AB142D97548D /* RootView.swift */; };
+		AA075E4E5F649F3F2D71CE36 /* HopcastKit in Frameworks */ = {isa = PBXBuildFile; productRef = E3F1085E7D85C74C96E05AB6 /* HopcastKit */; };
+		DE1EDBD4A6E2F5E9384DF41F /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB4C42060FDCE9D94505DA18 /* Config.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0759B02E6521C32AB96A8727 /* hopcast-sdk-ios */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "hopcast-sdk-ios"; path = ..; sourceTree = SOURCE_ROOT; };
+		23A22489D387F6A10F8E3248 /* HopcastController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HopcastController.swift; sourceTree = "<group>"; };
+		24407A687EDF6BEA0DF442B3 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
+		59A991C82BB2AB142D97548D /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		7010E01BAE4E51FA83DFB42F /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		7ECA705431E993CAF64AB076 /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
+		CB4C42060FDCE9D94505DA18 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		D8B62B8DDF99646D132EB752 /* HopcastExample.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = HopcastExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EBD1A1DFCDE350AEEAB78F91 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CC9F00D5A7614DB391D4BB0B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA075E4E5F649F3F2D71CE36 /* HopcastKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		04D1F59EB281C33EB8E6B055 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D8B62B8DDF99646D132EB752 /* HopcastExample.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4FBCA43FEF360C5F2F05280D /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				24407A687EDF6BEA0DF442B3 /* App.swift */,
+				CB4C42060FDCE9D94505DA18 /* Config.swift */,
+				23A22489D387F6A10F8E3248 /* HopcastController.swift */,
+				A567C692D196A665A17866B9 /* Views */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		6F26F4E61322F1BD9131BA8F /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				0759B02E6521C32AB96A8727 /* hopcast-sdk-ios */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		A567C692D196A665A17866B9 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				EBD1A1DFCDE350AEEAB78F91 /* DashboardView.swift */,
+				7ECA705431E993CAF64AB076 /* JournalView.swift */,
+				59A991C82BB2AB142D97548D /* RootView.swift */,
+				7010E01BAE4E51FA83DFB42F /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		F3F2DB33BE6D31EA02755C4B = {
+			isa = PBXGroup;
+			children = (
+				6F26F4E61322F1BD9131BA8F /* Packages */,
+				4FBCA43FEF360C5F2F05280D /* Sources */,
+				04D1F59EB281C33EB8E6B055 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F06AD54B550D57DADACC6D8F /* HopcastExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FD83F96F023486BBE47C9922 /* Build configuration list for PBXNativeTarget "HopcastExample" */;
+			buildPhases = (
+				6D0114EAA914D8F79ED0398D /* Sources */,
+				CC9F00D5A7614DB391D4BB0B /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HopcastExample;
+			packageProductDependencies = (
+				E3F1085E7D85C74C96E05AB6 /* HopcastKit */,
+			);
+			productName = HopcastExample;
+			productReference = D8B62B8DDF99646D132EB752 /* HopcastExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5D45D8C23D73FBE8D7310CE5 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					F06AD54B550D57DADACC6D8F = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 2BE8868F7CF349C9B4046AC8 /* Build configuration list for PBXProject "HopcastExample" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = F3F2DB33BE6D31EA02755C4B;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A5643E90AACF067CA53E039C /* XCLocalSwiftPackageReference ".." */,
+			);
+			preferredProjectObjectVersion = 54;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F06AD54B550D57DADACC6D8F /* HopcastExample */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6D0114EAA914D8F79ED0398D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				89B15969C3464882A0782EC1 /* App.swift in Sources */,
+				DE1EDBD4A6E2F5E9384DF41F /* Config.swift in Sources */,
+				2A9B1D1C34453DF86126F674 /* DashboardView.swift in Sources */,
+				2DD5A995B8E3A7E8196EFB7D /* HopcastController.swift in Sources */,
+				25A1092DD31BD2C065055072 /* JournalView.swift in Sources */,
+				8CB4CBCE945126F6C3814365 /* RootView.swift in Sources */,
+				65ADAD16A8286AA359F1602A /* SettingsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		3E9B293EDCB1DEF07E042F46 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		4C3FF8D8B4F3D68742275FCE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Generated/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = fr.hopcast.example;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		8528D9F457E8724B91751DC6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		ECC8F1B55BD394489E006AD4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Generated/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = fr.hopcast.example;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2BE8868F7CF349C9B4046AC8 /* Build configuration list for PBXProject "HopcastExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8528D9F457E8724B91751DC6 /* Debug */,
+				3E9B293EDCB1DEF07E042F46 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FD83F96F023486BBE47C9922 /* Build configuration list for PBXNativeTarget "HopcastExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ECC8F1B55BD394489E006AD4 /* Debug */,
+				4C3FF8D8B4F3D68742275FCE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A5643E90AACF067CA53E039C /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E3F1085E7D85C74C96E05AB6 /* HopcastKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HopcastKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 5D45D8C23D73FBE8D7310CE5 /* Project object */;
+}

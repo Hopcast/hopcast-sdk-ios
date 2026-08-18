@@ -1,0 +1,296 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.3.3 effective-5.10 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)
+// swift-module-flags: -target x86_64-apple-ios14.0-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -module-name HopcastKit
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface -formal-cxx-interoperability-mode=off -interface-compiler-version 6.3.3
+import CryptoKit
+import Foundation
+import MobileCoreServices
+import MultipeerConnectivity
+import Network
+import ObjectiveC
+import Security
+import Swift
+import UIKit
+import UniformTypeIdentifiers
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+import os
+import ObjectiveC.runtime
+public enum ConnectionState {
+  case discovering
+  case initiated
+  case onHold
+  case established
+  case rejected
+  case disconnected
+  public static func == (a: HopcastKit.ConnectionState, b: HopcastKit.ConnectionState) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum InfraType : Swift.String, Swift.Codable {
+  case d2d
+  case wifi
+  case cellular
+  case stored
+  public init?(rawValue: Swift.String)
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum Mode {
+  case offlineOnly
+  case onlineOnly
+  case hybrid
+  public static func == (a: HopcastKit.Mode, b: HopcastKit.Mode) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum TransferErrorReason {
+  case peerDisconnected
+  case invitationRejected
+  case sourceUnreadable
+  case storageFailure
+  case payloadFailure
+  case cancelled
+  case backendError
+  case controlChannelError
+  case unknown
+  public static func == (a: HopcastKit.TransferErrorReason, b: HopcastKit.TransferErrorReason) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum TransferEvent {
+  case transferProgress(transferId: Swift.String, isReceiver: Swift.Bool, bytesTransferred: Swift.Int64, totalBytes: Swift.Int64, peer: HopcastKit.Neighbor)
+  case fileProgress(transferId: Swift.String, isReceiver: Swift.Bool, file: HopcastKit.TransferFileInfo, bytesTransferred: Swift.Int64, totalBytes: Swift.Int64, peer: HopcastKit.Neighbor)
+  case fileCompleted(transferId: Swift.String, isReceiver: Swift.Bool, file: HopcastKit.TransferFileInfo, localPath: Swift.String?, fileIndex: Swift.Int, fileTotal: Swift.Int, peer: HopcastKit.Neighbor)
+  case fileFailed(transferId: Swift.String, isReceiver: Swift.Bool, file: HopcastKit.TransferFileInfo, reason: HopcastKit.TransferErrorReason, peer: HopcastKit.Neighbor)
+  case transferFailed(transferId: Swift.String, isReceiver: Swift.Bool, reason: HopcastKit.TransferErrorReason, peer: HopcastKit.Neighbor)
+  public var transferId: Swift.String {
+    get
+  }
+  public var isReceiver: Swift.Bool {
+    get
+  }
+}
+public enum TransferState {
+  case idle
+  case invited
+  case accepted
+  case inProgress
+  case finished
+  case cancelled
+  case failed
+  public static func == (a: HopcastKit.TransferState, b: HopcastKit.TransferState) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum HopcastSDK {
+  public static func provision(sdkKey: Swift.String, userId: Swift.String, completion: @escaping (Swift.Result<Swift.Void, any Swift.Error>) -> Swift.Void)
+  public static var isProvisioned: Swift.Bool {
+    get
+  }
+  public static func clearIdentity()
+  public static func builder(deviceId: Swift.String, cacheDirectory: Foundation.URL) -> HopcastKit.HopcastSDK.Builder
+  public static var requiredPermissions: [Swift.String] {
+    get
+  }
+  public static var mode: HopcastKit.Mode {
+    get
+  }
+  public static var deviceUuid: Swift.String {
+    get
+  }
+  public static func release()
+  public static func enableOfflineMode()
+  public static func disableOfflineMode()
+  public static func enableOnlineMode()
+  public static func disableOnlineMode()
+  public static func setDeviceDiscoveryListener(_ listener: (any HopcastKit.DeviceDiscoveryListener)?)
+  public static func setConnectionListener(_ listener: any HopcastKit.ConnectionListener, tag: Swift.String)
+  public static func removeConnectionListener(tag: Swift.String)
+  public static func setTransferListener(_ listener: any HopcastKit.TransferListener, tag: Swift.String)
+  public static func removeTransferListener(tag: Swift.String)
+  public static func setOnlineEventListener(_ listener: any HopcastKit.OnlineEventListener, tag: Swift.String)
+  public static func removeOnlineEventListener(tag: Swift.String)
+  public static func setTransferHandoffListener(_ listener: any HopcastKit.TransferHandoffListener, tag: Swift.String)
+  public static func removeTransferHandoffListener(tag: Swift.String)
+  public static func startSharing(listener: (any HopcastKit.DeviceDiscoveryListener)? = nil)
+  public static func stopSharing()
+  public static func inviteNeighbors(endpointIds: [Swift.String])
+  public static func acceptInvitation(endpointId: Swift.String)
+  public static func rejectInvitation(endpointId: Swift.String)
+  @discardableResult
+  public static func sendFiles(endpointIds: [Swift.String], files: [Foundation.URL], metadata: Foundation.Data? = nil) -> Swift.String?
+  public static func acceptTransfer(transferId: Swift.String)
+  public static func rejectTransfer(transferId: Swift.String)
+  public static func cancelTransfer(transferId: Swift.String)
+  public static func reportDownloadedFile(infraType: HopcastKit.InfraType, contentIds: [Swift.String])
+  public static func reportRemovedFile(contentIds: [Swift.String])
+  @discardableResult
+  public static func declareNeed(contentId: Swift.String, ttlSeconds: Swift.Int) -> Swift.String?
+  public static func cancelNeed(needId: Swift.String)
+  public static func handleFcmMessage(_ data: [Swift.String : Swift.String])
+  public static func handleFcmToken(_ token: Swift.String)
+  @_hasMissingDesignatedInitializers final public class Builder {
+    @discardableResult
+    final public func setServiceId(_ serviceId: Swift.String) -> HopcastKit.HopcastSDK.Builder
+    @discardableResult
+    final public func setAutoAcceptConnections(_ enabled: Swift.Bool) -> HopcastKit.HopcastSDK.Builder
+    @discardableResult
+    final public func setAutoAcceptTransfers(_ enabled: Swift.Bool) -> HopcastKit.HopcastSDK.Builder
+    @discardableResult
+    final public func setTelemetryEndpoint(url: Swift.String?, appToken: Swift.String? = nil) -> HopcastKit.HopcastSDK.Builder
+    @discardableResult
+    final public func setMode(_ mode: HopcastKit.Mode) -> HopcastKit.HopcastSDK.Builder
+    @discardableResult
+    final public func setOnlineConfig(_ config: HopcastKit.OnlineConfig) -> HopcastKit.HopcastSDK.Builder
+    @discardableResult
+    final public func build() -> HopcastKit.HopcastSDK.Type
+    @objc deinit
+  }
+}
+public enum HopcastIdentityError : Swift.Error, Swift.Equatable {
+  case notProvisioned
+  case invalidResponse
+  case server(statusCode: Swift.Int)
+  public static func == (a: HopcastKit.HopcastIdentityError, b: HopcastKit.HopcastIdentityError) -> Swift.Bool
+}
+public protocol ConnectionListener : AnyObject {
+  func onIncomingConnectionRequest(neighbor: HopcastKit.Neighbor)
+  func onConnectionStateChanged(state: HopcastKit.ConnectionState, neighbor: HopcastKit.Neighbor)
+}
+extension HopcastKit.ConnectionListener {
+  public func onIncomingConnectionRequest(neighbor: HopcastKit.Neighbor)
+  public func onConnectionStateChanged(state: HopcastKit.ConnectionState, neighbor: HopcastKit.Neighbor)
+}
+public protocol DeviceDiscoveryListener : AnyObject {
+  func onNeighborsChanged(_ neighbors: [HopcastKit.Neighbor])
+}
+public protocol OnlineEventListener : AnyObject {
+  func onFilesToBeDownloaded(fileIds: [Swift.String])
+  func onCloudReady(deviceUuid: Swift.String)
+  func onCloudDisconnected()
+  func onCloudError(reason: Swift.String)
+}
+extension HopcastKit.OnlineEventListener {
+  public func onFilesToBeDownloaded(fileIds: [Swift.String])
+  public func onCloudReady(deviceUuid: Swift.String)
+  public func onCloudDisconnected()
+  public func onCloudError(reason: Swift.String)
+}
+public protocol TransferListener : AnyObject {
+  func onTransferInvitation(_ invitation: HopcastKit.TransferInvitation)
+  func onTransferStateChanged(transferId: Swift.String, isReceiver: Swift.Bool, state: HopcastKit.TransferState, peer: HopcastKit.Neighbor)
+  func onTransferEvent(_ event: HopcastKit.TransferEvent)
+}
+extension HopcastKit.TransferListener {
+  public func onTransferInvitation(_ invitation: HopcastKit.TransferInvitation)
+  public func onTransferStateChanged(transferId: Swift.String, isReceiver: Swift.Bool, state: HopcastKit.TransferState, peer: HopcastKit.Neighbor)
+  public func onTransferEvent(_ event: HopcastKit.TransferEvent)
+}
+public struct Neighbor : Swift.Hashable, Swift.Equatable, Swift.Sendable {
+  public let endpointId: Swift.String
+  public let displayName: Swift.String
+  public init(endpointId: Swift.String, displayName: Swift.String)
+  public static func == (a: HopcastKit.Neighbor, b: HopcastKit.Neighbor) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public struct OnlineConfig : Swift.Sendable {
+  public static let defaultBrokerUrl: Foundation.URL
+  public let brokerUrl: Foundation.URL
+  public let isSecondaryFcm: Swift.Bool
+  public let runAsService: Swift.Bool
+  public init(brokerUrl: Foundation.URL = OnlineConfig.defaultBrokerUrl, isSecondaryFcm: Swift.Bool = true, runAsService: Swift.Bool = false)
+}
+public struct TransferFileInfo : Swift.Hashable, Swift.Equatable, Swift.Sendable {
+  public let id: Swift.String
+  public let name: Swift.String
+  public let size: Swift.Int64
+  public let mimeType: Swift.String?
+  public init(id: Swift.String, name: Swift.String, size: Swift.Int64, mimeType: Swift.String?)
+  public static func == (a: HopcastKit.TransferFileInfo, b: HopcastKit.TransferFileInfo) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public struct TransferInvitation : Swift.Hashable, Swift.Equatable, Swift.Sendable {
+  public let transferId: Swift.String
+  public let sender: HopcastKit.Neighbor
+  public let files: [HopcastKit.TransferFileInfo]
+  public let totalBytes: Swift.Int64
+  public let customMetadata: Foundation.Data?
+  public init(transferId: Swift.String, sender: HopcastKit.Neighbor, files: [HopcastKit.TransferFileInfo], totalBytes: Swift.Int64, customMetadata: Foundation.Data?)
+  public static func == (a: HopcastKit.TransferInvitation, b: HopcastKit.TransferInvitation) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum ExchangeDirection : Swift.String, Swift.Codable, Swift.Sendable {
+  case download
+  case upload
+  public init?(rawValue: Swift.String)
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public struct TransferHandoff : Swift.Equatable, Swift.Sendable {
+  public enum Status : Swift.String, Swift.Sendable {
+    case success
+    case failure
+    public init?(rawValue: Swift.String)
+    public typealias RawValue = Swift.String
+    public var rawValue: Swift.String {
+      get
+    }
+  }
+  public struct FileReport : Swift.Equatable, Swift.Sendable {
+    public let fileId: Swift.String
+    public let bytes: Swift.Int64
+    public let direction: HopcastKit.ExchangeDirection
+    public init(fileId: Swift.String, bytes: Swift.Int64, direction: HopcastKit.ExchangeDirection)
+    public static func == (a: HopcastKit.TransferHandoff.FileReport, b: HopcastKit.TransferHandoff.FileReport) -> Swift.Bool
+  }
+  public let instructionId: Swift.String
+  public let status: HopcastKit.TransferHandoff.Status
+  public let reason: Swift.String?
+  public let bytesTotal: Swift.Int64?
+  public let files: [HopcastKit.TransferHandoff.FileReport]?
+  public init(instructionId: Swift.String, status: HopcastKit.TransferHandoff.Status, reason: Swift.String? = nil, bytesTotal: Swift.Int64?, files: [HopcastKit.TransferHandoff.FileReport]? = nil)
+  public static func == (a: HopcastKit.TransferHandoff, b: HopcastKit.TransferHandoff) -> Swift.Bool
+}
+public protocol TransferHandoffListener : AnyObject {
+  func onTransferHandoff(_ handoff: HopcastKit.TransferHandoff)
+}
+extension HopcastKit.ConnectionState : Swift.Equatable {}
+extension HopcastKit.ConnectionState : Swift.Hashable {}
+extension HopcastKit.InfraType : Swift.Equatable {}
+extension HopcastKit.InfraType : Swift.Hashable {}
+extension HopcastKit.InfraType : Swift.RawRepresentable {}
+extension HopcastKit.Mode : Swift.Equatable {}
+extension HopcastKit.Mode : Swift.Hashable {}
+extension HopcastKit.TransferErrorReason : Swift.Equatable {}
+extension HopcastKit.TransferErrorReason : Swift.Hashable {}
+extension HopcastKit.TransferState : Swift.Equatable {}
+extension HopcastKit.TransferState : Swift.Hashable {}
+extension HopcastKit.ExchangeDirection : Swift.Equatable {}
+extension HopcastKit.ExchangeDirection : Swift.Hashable {}
+extension HopcastKit.ExchangeDirection : Swift.RawRepresentable {}
+extension HopcastKit.TransferHandoff.Status : Swift.Equatable {}
+extension HopcastKit.TransferHandoff.Status : Swift.Hashable {}
+extension HopcastKit.TransferHandoff.Status : Swift.RawRepresentable {}

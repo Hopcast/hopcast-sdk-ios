@@ -1,0 +1,13 @@
+Hopcast SDK License
+
+Copyright (c) 2026 Hopcast. All rights reserved.
+
+The Hopcast SDK is provided as a compiled binary framework for the sole purpose of
+integrating Hopcast services into your application, under an agreement with Hopcast.
+
+You may not: (a) reverse engineer, decompile, disassemble or otherwise attempt to derive
+the source code of the SDK; (b) modify, adapt or create derivative works of the SDK;
+(c) redistribute the SDK other than embedded in your application binary.
+
+THE SDK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. IN NO EVENT SHALL HOPCAST BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM ITS USE.
