@@ -39,7 +39,7 @@ and add the `HopcastKit` product to your app target. Or in a `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/Hopcast/hopcast-sdk-ios", from: "0.4.0")
+    .package(url: "https://github.com/Hopcast/hopcast-sdk-ios", from: "0.4.1")
 ]
 ```
 
@@ -53,22 +53,31 @@ All SDK entry points live on the `HopcastSDK` facade.
 
 ---
 
+## Getting your SDK key
+
+Your SDK key (`pk_live_…`) is obtained from your Hopcast account management console at
+**https://console.hopcast.io**. It is designed to be embedded in your app and can be
+revoked at any time from the console.
+
+---
+
 ## 2. Try the example app first (recommended)
 
 `Example/HopcastExample.xcodeproj` is a ready-to-run SwiftUI app that demonstrates the
 full integration. You need **two physical iPhones** (device-to-device transfers do not
-work in the simulator) and a Hopcast SDK key (`pk_live_…`, provided with your account).
+work in the simulator) and an SDK key (see *Getting your SDK key* above).
 
 1. Open `Example/HopcastExample.xcodeproj`, select your development team, and run the
    app on both iPhones.
 2. On first launch, enter your SDK key to enroll each device (once per install).
-3. **Offline flow**: on the *Dashboard* tab, nearby devices appear under "Voisins D2D".
-   Connect to one, create a demo content, long-press it and send it to the neighbor.
-4. **Online flow**: enable the "Mode online" toggle on both devices. On device A,
+3. **Offline flow**: on the *Dashboard* tab, nearby devices appear under "Nearby
+   devices". Connect to one, create a demo content, long-press it and send it to the
+   neighbor.
+4. **Online flow**: enable the "Online mode" toggle on both devices. On device A,
    create a demo content (it is declared to Hopcast automatically). On device B, request
-   that content id in the "Besoins" section. Within seconds Hopcast orchestrates the
+   that content id in the "Needs" section. Within seconds Hopcast orchestrates the
    transfer from A to B automatically — no user interaction.
-5. The *Journal* tab shows every SDK callback as it happens; the *Réglages* tab shows
+5. The *Journal* tab shows every SDK callback as it happens; the *Settings* tab shows
    the device identity and connection status.
 
 The app's source (`Example/Sources/`) is intentionally small and heavily commented:

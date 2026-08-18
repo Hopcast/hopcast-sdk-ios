@@ -8,10 +8,10 @@ struct DashboardView: View {
     @FocusState private var needFieldFocused: Bool
 
     private static let sampleSizes: [(label: String, bytes: Int)] = [
-        ("50 Ko", 50_000),
-        ("1 Mo", 1_000_000),
-        ("10 Mo", 10_000_000),
-        ("50 Mo", 50_000_000),
+        ("50 KB", 50_000),
+        ("1 MB", 1_000_000),
+        ("10 MB", 10_000_000),
+        ("50 MB", 50_000_000),
     ]
 
     var body: some View {
@@ -43,7 +43,7 @@ struct DashboardView: View {
                     .font(.system(.caption, design: .monospaced))
                     .textSelection(.enabled)
             }
-            Toggle("Mode online (MQTT)", isOn: Binding(
+            Toggle("Online mode", isOn: Binding(
                 get: { controller.onlineEnabled },
                 set: { controller.setOnline($0) }
             ))
@@ -52,7 +52,7 @@ struct DashboardView: View {
                     Circle()
                         .fill(controller.cloudConnected ? .green : .red)
                         .frame(width: 10, height: 10)
-                    Text(controller.cloudConnected ? "connectée" : "déconnectée")
+                    Text(controller.cloudConnected ? "connected" : "disconnected")
                 }
             }
         }
@@ -61,9 +61,9 @@ struct DashboardView: View {
     // MARK: - Neighbors
 
     private var neighborsSection: some View {
-        Section("Voisins D2D") {
+        Section("Nearby devices") {
             if controller.neighbors.isEmpty {
-                Text("Aucun appareil détecté")
+                Text("No device detected")
                     .foregroundStyle(.secondary)
             }
             ForEach(controller.neighbors, id: \.endpointId) { neighbor in
@@ -72,13 +72,13 @@ struct DashboardView: View {
                         Text(neighbor.displayName)
                             .font(.system(.caption, design: .monospaced))
                         Text(controller.connectedNeighbors.contains(neighbor.endpointId)
-                             ? "connecté" : "détecté")
+                             ? "connected" : "discovered")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
                     if !controller.connectedNeighbors.contains(neighbor.endpointId) {
-                        Button("Connecter") { controller.connect(to: neighbor) }
+                        Button("Connect") { controller.connect(to: neighbor) }
                             .buttonStyle(.bordered)
                     }
                 }
@@ -95,7 +95,7 @@ struct DashboardView: View {
                     VStack(alignment: .leading) {
                         Text(content.contentId)
                             .font(.system(.caption, design: .monospaced))
-                        Text("\(content.bytes) octets")
+                        Text("\(content.bytes) bytes")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -109,14 +109,14 @@ struct DashboardView: View {
                     ForEach(controller.neighbors.filter {
                         controller.connectedNeighbors.contains($0.endpointId)
                     }, id: \.endpointId) { neighbor in
-                        Button("Envoyer à \(neighbor.displayName)") {
+                        Button("Send to \(neighbor.displayName)") {
                             controller.send(content, to: neighbor)
                         }
                     }
                     Button(role: .destructive) {
                         controller.deleteContent(content)
                     } label: {
-                        Label("Supprimer (has/remove)", systemImage: "trash")
+                        Label("Delete (has/remove)", systemImage: "trash")
                     }
                 }
             }
@@ -125,12 +125,12 @@ struct DashboardView: View {
                     Button(size.label) { controller.createSampleContent(size: size.bytes) }
                 }
             } label: {
-                Label("Créer un contenu de démo (has/new)", systemImage: "plus")
+                Label("Create a demo content (has/new)", systemImage: "plus")
             }
         } header: {
-            Text("Contenus locaux")
+            Text("Local contents")
         } footer: {
-            Text("Le nom du fichier est le content_id. Appui long : envoi manuel ou suppression.")
+            Text("The file name is the content_id. Long-press a content for manual send or delete.")
         }
     }
 
@@ -148,7 +148,7 @@ struct DashboardView: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Button("Annuler") { controller.cancelNeed(need) }
+                    Button("Cancel") { controller.cancelNeed(need) }
                         .buttonStyle(.bordered)
                 }
             }
@@ -165,7 +165,7 @@ struct DashboardView: View {
                         let digits = value.filter(\.isNumber)
                         if digits != value { neededContentId = digits }
                     }
-                Button("Demander") {
+                Button("Request") {
                     let digits = neededContentId.trimmingCharacters(in: .whitespaces)
                     guard !digits.isEmpty else { return }
                     controller.declareNeed(contentId: "demo-" + digits, ttlSeconds: needTtl)
@@ -176,10 +176,10 @@ struct DashboardView: View {
                 .disabled(neededContentId.trimmingCharacters(in: .whitespaces).isEmpty)
             }
         } header: {
-            Text("Besoins (needs)")
+            Text("Needs")
         } footer: {
-            Text("Déclare un besoin : le backend orchestrera un transfert D2D depuis un voisin "
-                 + "qui possède ce contenu (même tenant).")
+            Text("Files a need: Hopcast will automatically deliver this content from a nearby "
+                 + "device that has it.")
         }
     }
 }

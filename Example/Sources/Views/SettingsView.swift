@@ -27,7 +27,7 @@ struct SettingsView: View {
                 brokerSection
                 appSection
             }
-            .navigationTitle("Réglages")
+            .navigationTitle("Settings")
             .scrollDismissesKeyboard(.interactively)
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
@@ -40,80 +40,80 @@ struct SettingsView: View {
     }
 
     private var identitySection: some View {
-        Section("Identité") {
+        Section("Identity") {
             LabeledContent("Device ID") {
                 Text(controller.deviceId)
                     .font(.system(.caption, design: .monospaced))
                     .textSelection(.enabled)
             }
-            LabeledContent("Utilisateur", value: controller.userId)
-            LabeledContent("Clé SDK") {
+            LabeledContent("User", value: controller.userId)
+            LabeledContent("SDK key") {
                 Text(controller.sdkKey.prefix(16) + "…")
                     .font(.system(.caption, design: .monospaced))
             }
             Button(role: .destructive) {
                 controller.resetIdentity()
             } label: {
-                Label("Réinitialiser l'identité", systemImage: "person.crop.circle.badge.xmark")
+                Label("Reset identity", systemImage: "person.crop.circle.badge.xmark")
             }
         }
     }
 
     private var backendSection: some View {
         Section {
-            LabeledContent("API REST") {
+            LabeledContent("REST API") {
                 Text("https://api.hopcast.io")
                     .font(.system(.caption, design: .monospaced))
             }
-            LabeledContent("Broker MQTT") {
+            LabeledContent("Cloud endpoint") {
                 Text(controller.effectiveBrokerUrl)
                     .font(.system(.caption, design: .monospaced))
                     .textSelection(.enabled)
             }
-            LabeledContent("Session MQTT") {
+            LabeledContent("Cloud session") {
                 HStack(spacing: 6) {
                     Circle()
                         .fill(controller.cloudConnected ? .green : .red)
                         .frame(width: 10, height: 10)
-                    Text(controller.cloudConnected ? "connectée" : "déconnectée")
+                    Text(controller.cloudConnected ? "connected" : "disconnected")
                 }
             }
         } header: {
             Text("Backend")
         } footer: {
-            Text("L'API REST (enrôlement, refresh JWT, reporting /v1/exchanges) est fixée par le SDK.")
+            Text("The REST API (enrollment, token refresh, exchange reporting) is fixed by the SDK.")
         }
     }
 
     private var brokerSection: some View {
         Section {
-            TextField("wss://mqtt.hopcast.io/mqtt (défaut si vide)", text: $brokerField)
+            TextField("production default if empty", text: $brokerField)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .keyboardType(.URL)
                 .focused($brokerFieldFocused)
                 .font(.system(.caption, design: .monospaced))
-            Button("Appliquer") {
+            Button("Apply") {
                 controller.setBrokerOverride(brokerField)
                 brokerFieldFocused = false
             }
             .disabled(brokerField.trimmingCharacters(in: .whitespaces) == controller.brokerOverride)
         } header: {
-            Text("Broker override")
+            Text("Endpoint override (advanced)")
         } footer: {
-            Text("Vide = broker de production du SDK. Ex. local : ws://192.168.68.151:9001. "
-                 + "Prend effet au prochain lancement de l'app.")
+            Text("Empty = the SDK's production endpoint. Takes effect at the next app launch. "
+                 + "Leave unchanged unless instructed by Hopcast support.")
         }
     }
 
     private var appSection: some View {
         Section("Application") {
             LabeledContent("Version", value: appVersion)
-            LabeledContent("Mode SDK", value: "\(HopcastSDK.mode)")
-            LabeledContent("Contenus en cache") {
-                Text("\(controller.contents.count) — \(cacheBytes) o")
+            LabeledContent("SDK mode", value: "\(HopcastSDK.mode)")
+            LabeledContent("Cached contents") {
+                Text("\(controller.contents.count) — \(cacheBytes) B")
             }
-            LabeledContent("Répertoire cache") {
+            LabeledContent("Cache directory") {
                 Text(DemoConfig.cacheDirectory.path)
                     .font(.system(.caption2, design: .monospaced))
                     .textSelection(.enabled)

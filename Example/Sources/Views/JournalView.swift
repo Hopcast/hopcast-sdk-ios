@@ -32,9 +32,9 @@ struct JournalView: View {
                         Image(systemName: "list.bullet.rectangle")
                             .font(.largeTitle)
                             .foregroundStyle(.secondary)
-                        Text("Aucun événement")
+                        Text("No events yet")
                             .font(.headline)
-                        Text("Active le mode online pour voir la session MQTT vivre.")
+                        Text("Enable online mode to watch the cloud session live.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }

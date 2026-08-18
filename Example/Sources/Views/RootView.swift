@@ -7,11 +7,11 @@ struct RootView: View {
         if controller.isProvisioned {
             TabView {
                 DashboardView()
-                    .tabItem { Label("Tableau de bord", systemImage: "antenna.radiowaves.left.and.right") }
+                    .tabItem { Label("Dashboard", systemImage: "antenna.radiowaves.left.and.right") }
                 JournalView()
                     .tabItem { Label("Journal", systemImage: "list.bullet.rectangle") }
                 SettingsView()
-                    .tabItem { Label("Réglages", systemImage: "gearshape") }
+                    .tabItem { Label("Settings", systemImage: "gearshape") }
             }
         } else {
             ProvisionView()
@@ -29,22 +29,22 @@ struct ProvisionView: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Clé SDK (pk_live_…)", text: $sdkKey)
+                    TextField("SDK key (pk_live_…)", text: $sdkKey)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                         .font(.system(.body, design: .monospaced))
-                    TextField("Identifiant utilisateur", text: $userId)
+                    TextField("User identifier", text: $userId)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                 } header: {
-                    Text("Enrôlement")
+                    Text("Enrollment")
                 } footer: {
-                    Text("La clé SDK est fournie par Hopcast. L'enrôlement n'a lieu qu'une fois : "
-                         + "l'identité device (device_id + JWT) est ensuite conservée dans le Keychain.")
+                    Text("Get your SDK key (pk_live_…) from your Hopcast account console. Enrollment "
+                         + "happens once: the device identity is then kept in the Keychain.")
                 }
 
                 Section {
-                    Button("Enrôler ce device") {
+                    Button("Enroll this device") {
                         controller.sdkKey = sdkKey
                         controller.userId = userId
                         controller.provision()

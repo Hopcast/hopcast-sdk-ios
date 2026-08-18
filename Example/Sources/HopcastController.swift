@@ -62,12 +62,12 @@ final class HopcastController: ObservableObject {
     func setBrokerOverride(_ value: String) {
         let trimmed = value.trimmingCharacters(in: .whitespaces)
         if !trimmed.isEmpty, URL(string: trimmed)?.scheme == nil {
-            log(.error, "URL broker invalide : \(trimmed)")
+            log(.error, "Invalid endpoint URL: \(trimmed)")
             return
         }
         brokerOverride = trimmed
         objectWillChange.send()
-        log(.action, "Broker override → \(trimmed.isEmpty ? "défaut prod" : trimmed) — relance l'app pour appliquer")
+        log(.action, "Endpoint override → \(trimmed.isEmpty ? "production default" : trimmed) — relaunch the app to apply")
     }
 
     private var built = false
@@ -87,10 +87,10 @@ final class HopcastController: ObservableObject {
     func provision() {
         let key = sdkKey.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !key.isEmpty else {
-            log(.error, "Clé SDK manquante — renseigne pk_live_…")
+            log(.error, "Missing SDK key — set your pk_live_… key")
             return
         }
-        log(.action, "Enrôlement du device…")
+        log(.action, "Enrolling this device…")
         HopcastSDK.provision(sdkKey: key, userId: userId) { [weak self] result in
             DispatchQueue.main.async {
                 guard let self else { return }
@@ -98,10 +98,10 @@ final class HopcastController: ObservableObject {
                 case .success:
                     self.isProvisioned = true
                     self.deviceId = HopcastSDK.deviceUuid
-                    self.log(.action, "Device enrôlé : \(self.deviceId)")
+                    self.log(.action, "Device enrolled: \(self.deviceId)")
                     self.bootstrap()
                 case .failure(let error):
-                    self.log(.error, "Échec de l'enrôlement : \(error.localizedDescription)")
+                    self.log(.error, "Enrollment failed: \(error.localizedDescription)")
                 }
             }
         }
@@ -116,7 +116,7 @@ final class HopcastController: ObservableObject {
         onlineEnabled = false
         cloudConnected = false
         built = false
-        log(.action, "Identité effacée — relance l'app pour ré-enrôler")
+        log(.action, "Identity cleared — relaunch the app to enroll again")
     }
 
     /// Builds the SDK singleton. Called once, after provisioning (the advertised
@@ -147,7 +147,7 @@ final class HopcastController: ObservableObject {
         HopcastSDK.setTransferHandoffListener(self, tag: listenerTag)
 
         deviceId = HopcastSDK.deviceUuid
-        log(.action, "SDK construit (mode hybrid, device \(deviceId))")
+        log(.action, "SDK built (hybrid mode, device \(deviceId))")
     }
 
     // ------------------------------------------------------------------------
@@ -158,11 +158,11 @@ final class HopcastController: ObservableObject {
         onlineEnabled = enabled
         if enabled {
             HopcastSDK.enableOnlineMode()
-            log(.action, "Mode online activé — connexion MQTT en cours")
+            log(.action, "Online mode enabled — connecting to the cloud")
         } else {
             HopcastSDK.disableOnlineMode()
             cloudConnected = false
-            log(.action, "Mode online désactivé")
+            log(.action, "Online mode disabled")
         }
     }
 
@@ -204,11 +204,11 @@ final class HopcastController: ObservableObject {
                 written += slice.count
             }
         } catch {
-            log(.error, "Écriture du contenu impossible : \(error.localizedDescription)")
+            log(.error, "Could not write the content: \(error.localizedDescription)")
             return
         }
         HopcastSDK.reportDownloadedFile(infraType: .wifi, contentIds: [contentId])
-        log(.action, "Contenu \(contentId) créé (\(size) o) et déclaré (has/new)")
+        log(.action, "Content \(contentId) created (\(size) B) and declared (has/new)")
         refreshContents()
     }
 
@@ -217,7 +217,7 @@ final class HopcastController: ObservableObject {
             at: DemoConfig.cacheDirectory.appendingPathComponent(content.contentId)
         )
         HopcastSDK.reportRemovedFile(contentIds: [content.contentId])
-        log(.action, "Contenu \(content.contentId) supprimé (has/remove)")
+        log(.action, "Content \(content.contentId) removed (has/remove)")
         refreshContents()
     }
 
@@ -226,9 +226,9 @@ final class HopcastController: ObservableObject {
     func send(_ content: LocalContent, to neighbor: Neighbor) {
         let url = DemoConfig.cacheDirectory.appendingPathComponent(content.contentId)
         if let transferId = HopcastSDK.sendFiles(endpointIds: [neighbor.endpointId], files: [url]) {
-            log(.transfer, "Envoi manuel de \(content.contentId) vers \(neighbor.displayName) (\(transferId))")
+            log(.transfer, "Manual send of \(content.contentId) to \(neighbor.displayName) (\(transferId))")
         } else {
-            log(.error, "Envoi impossible — voisin non connecté ?")
+            log(.error, "Send failed — is the neighbor connected?")
         }
     }
 
@@ -238,17 +238,17 @@ final class HopcastController: ObservableObject {
 
     func declareNeed(contentId: String, ttlSeconds: Int) {
         guard let needId = HopcastSDK.declareNeed(contentId: contentId, ttlSeconds: ttlSeconds) else {
-            log(.error, "declareNeed refusé (SDK non provisionné ou online absent)")
+            log(.error, "declareNeed rejected (SDK not provisioned or online mode unavailable)")
             return
         }
         needs.append(FiledNeed(needId: needId, contentId: contentId, ttlSeconds: ttlSeconds))
-        log(.action, "Besoin déclaré pour \(contentId) (need \(needId.prefix(8))…, TTL \(ttlSeconds)s)")
+        log(.action, "Need filed for \(contentId) (need \(needId.prefix(8))…, TTL \(ttlSeconds)s)")
     }
 
     func cancelNeed(_ need: FiledNeed) {
         HopcastSDK.cancelNeed(needId: need.needId)
         needs.removeAll { $0.needId == need.needId }
-        log(.action, "Besoin \(need.needId.prefix(8))… annulé")
+        log(.action, "Need \(need.needId.prefix(8))… cancelled")
     }
 
     // ------------------------------------------------------------------------
@@ -257,7 +257,7 @@ final class HopcastController: ObservableObject {
 
     func connect(to neighbor: Neighbor) {
         HopcastSDK.inviteNeighbors(endpointIds: [neighbor.endpointId])
-        log(.discovery, "Invitation envoyée à \(neighbor.displayName)")
+        log(.discovery, "Invitation sent to \(neighbor.displayName)")
     }
 
     // ------------------------------------------------------------------------
@@ -281,7 +281,7 @@ final class HopcastController: ObservableObject {
 extension HopcastController: DeviceDiscoveryListener {
     func onNeighborsChanged(_ neighbors: [Neighbor]) {
         self.neighbors = neighbors
-        log(.discovery, "Voisinage : \(neighbors.isEmpty ? "aucun appareil" : neighbors.map(\.displayName).joined(separator: ", "))")
+        log(.discovery, "Neighborhood: \(neighbors.isEmpty ? "no device" : neighbors.map(\.displayName).joined(separator: ", "))")
     }
 }
 
@@ -298,16 +298,16 @@ extension HopcastController: ConnectionListener {
 
 extension HopcastController: TransferListener {
     func onTransferStateChanged(transferId: String, isReceiver: Bool, state: TransferState, peer: Neighbor) {
-        log(.transfer, "Transfert \(transferId.prefix(8))… (\(isReceiver ? "réception" : "envoi")) : \(state)")
+        log(.transfer, "Transfer \(transferId.prefix(8))… (\(isReceiver ? "receiving" : "sending")): \(state)")
     }
 
     func onTransferEvent(_ event: TransferEvent) {
         switch event {
         case .fileCompleted(_, let isReceiver, let file, _, _, _, _):
-            log(.transfer, "Fichier \(file.name) \(isReceiver ? "reçu" : "envoyé") (\(file.size) o)")
+            log(.transfer, "File \(file.name) \(isReceiver ? "received" : "sent") (\(file.size) B)")
             if isReceiver { refreshContents() }
         case .transferFailed(_, _, let reason, _):
-            log(.error, "Transfert échoué : \(reason)")
+            log(.error, "Transfer failed: \(reason)")
         default:
             break
         }
@@ -317,27 +317,27 @@ extension HopcastController: TransferListener {
 extension HopcastController: OnlineEventListener {
     func onCloudReady(deviceUuid: String) {
         cloudConnected = true
-        log(.cloud, "Session MQTT établie (device \(deviceUuid))")
+        log(.cloud, "Cloud session established (device \(deviceUuid))")
     }
 
     func onCloudDisconnected() {
         cloudConnected = false
-        log(.cloud, "Session MQTT perdue — reconnexion automatique")
+        log(.cloud, "Cloud session lost — reconnecting automatically")
     }
 
     func onCloudError(reason: String) {
-        log(.error, "Erreur cloud : \(reason)")
+        log(.error, "Cloud error: \(reason)")
     }
 
     func onFilesToBeDownloaded(fileIds: [String]) {
         fileIds.forEach { expectedContents.insert($0) }
-        log(.cloud, "Instruction reçue : contenu(s) à obtenir \(fileIds.joined(separator: ", "))")
+        log(.cloud, "Delivery scheduled: content(s) to obtain \(fileIds.joined(separator: ", "))")
     }
 }
 
 extension HopcastController: TransferHandoffListener {
     func onTransferHandoff(_ handoff: TransferHandoff) {
-        let bytes = handoff.bytesTotal.map { "\($0) o" } ?? "volume inconnu"
-        log(.cloud, "Instruction \(handoff.instructionId.prefix(8))… terminée : \(handoff.status) (\(bytes))")
+        let bytes = handoff.bytesTotal.map { "\($0) B" } ?? "unknown volume"
+        log(.cloud, "Instruction \(handoff.instructionId.prefix(8))… finished: \(handoff.status) (\(bytes))")
     }
 }

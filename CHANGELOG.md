@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1 — 2026-08-18
+
+- Example app fully translated to English.
+- README: where to obtain the SDK key (account management console).
+- No SDK code change (binary rebuilt as 0.4.1).
+
 ## 0.4.0 — 2026-08-18
 
 - First public binary distribution (`HopcastKit.xcframework`).
