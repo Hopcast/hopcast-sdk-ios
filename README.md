@@ -34,8 +34,7 @@ trigger the transfer automatically. Every exchange is reported to your Hopcast d
 
 | Path | Content |
 |---|---|
-| `HopcastKit.xcframework` | The SDK — compiled binary framework (device + simulator) |
-| `Package.swift` | Swift Package manifest so the repo is consumable via SPM |
+| `Package.swift` | Swift Package manifest — the compiled SDK (device + simulator) is downloaded from this repository's GitHub Releases (`HopcastKit.xcframework.zip`, checksum-verified by SPM) |
 | `Example/` | A complete SwiftUI example app |
 | `docs/API.md` | Full API reference |
 | `CHANGELOG.md` | Release history |
