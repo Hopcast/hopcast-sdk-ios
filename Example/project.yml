@@ -30,7 +30,7 @@ targets:
       path: Generated/Info.plist
       properties:
         CFBundleDisplayName: Hopcast Example
-        CFBundleShortVersionString: "0.4.1"
+        CFBundleShortVersionString: "0.6.0"
         CFBundleVersion: "1"
         UILaunchScreen:
           UIColorName: ""
@@ -39,8 +39,10 @@ targets:
         NSLocalNetworkUsageDescription: "Hopcast Example uses the local network to exchange content with nearby devices."
         NSBonjourServices:
           - "_hopcast._tcp"
-          - "_hopcast._udp"
         NSBluetoothAlwaysUsageDescription: "Hopcast Example uses Bluetooth to discover nearby devices."
+        UIBackgroundModes:
+          - bluetooth-central
+          - bluetooth-peripheral
         ITSAppUsesNonExemptEncryption: false
     settings:
       base:

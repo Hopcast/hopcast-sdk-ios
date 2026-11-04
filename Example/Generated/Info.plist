@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.4.1</string>
+	<string>0.6.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
@@ -27,10 +27,14 @@
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_hopcast._tcp</string>
-		<string>_hopcast._udp</string>
 	</array>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Hopcast Example uses the local network to exchange content with nearby devices.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+		<string>bluetooth-peripheral</string>
+	</array>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
