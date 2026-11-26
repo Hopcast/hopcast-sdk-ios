@@ -66,7 +66,7 @@ and add the `HopcastKit` product to your app target. Or in a `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/Hopcast/hopcast-sdk-ios", from: "0.6.0")
+    .package(url: "https://github.com/Hopcast/hopcast-sdk-ios", from: "0.7.0")
 ]
 ```
 

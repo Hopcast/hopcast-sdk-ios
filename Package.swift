@@ -10,8 +10,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "HopcastKit",
-            url: "https://github.com/Hopcast/hopcast-sdk-ios/releases/download/0.6.0/HopcastKit.xcframework.zip",
-            checksum: "7707013e95d7988e32502cd271113e4aa9b272ea151bc8a548deba1bc2f68a0a"
+            url: "https://github.com/Hopcast/hopcast-sdk-ios/releases/download/0.7.0/HopcastKit.xcframework.zip",
+            checksum: "8fcf9a595840eb820c297d5260f0dcb12d1fa58f9fbe2cf4e45d8c62caa7b702"
         )
     ]
 )
