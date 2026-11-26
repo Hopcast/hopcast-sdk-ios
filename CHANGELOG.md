@@ -11,9 +11,15 @@
 - **The media is shared between nearby devices.** For a server stream, the origin is downloaded about once for
   the whole group; for a local file, guests receive copies from nearby devices. Received media is checked for
   corruption.
-- **The session survives the leading device.** If the device that leads playback leaves, locks or goes out of
-  range, playback continues and another participant takes the lead within seconds. The original host can come
-  back and take the lead again.
+- **The session survives the leading device.** If the device that leads playback leaves the session
+  (`leave()`), it hands the lead over at once: the others get `masterChanged`, with no `hostLost` and no pause.
+  If it locks, crashes or goes out of range, playback continues and another participant takes the lead within
+  seconds. The original host can come back and take the lead again.
+- **Leave or stop for everyone.** `leave()` takes only this device out; `end()` stops playback for everyone and
+  can be called by any participant (host, lead or guest). The others get
+  `.ended(.endedBy(participantId:name:))`, so the app can show who stopped.
+- **Several sessions nearby.** `WatchTogether.invitations` lists every nearby session in discovery order, and
+  `WatchTogetherInvitation.participantCount` tells how many devices each one has (`nil` when unknown).
 - **Credentials stay on the device.** HTTP headers given for an origin are sent only to that origin, never to
   other participants, never logged. Each guest can use its own URL and credentials for the same media.
 - **Player-agnostic.** `PlayerClock` drives AVPlayer, VLCKit or any other player; `WatchTogetherCoarseClock`
@@ -59,9 +65,10 @@ Reference: [docs/API.md](docs/API.md) § 10.
   same-platform device that holds it. Playback control works across platforms.
 - One session per device at a time. Sources: a local file, or an HTTP(S) origin that honours byte ranges.
 - Watch Together is a foreground feature: call `resumeAfterForeground()` when the app becomes active again.
-- Validated on simulators and on two real iPhones (local file, pause / resume / seek, host leaving, shared
-  server stream). Not yet validated on real devices: more than two devices, long background suspension, and
-  sessions mixing iPhone and Android.
+- Validated on simulators and on three real iPhones (local file, pause / resume / seek, host leaving, shared
+  server stream, stop for everyone from the host or a guest, two sessions nearby seen from a third device). Not
+  yet validated on real devices: more than two devices in one session, long background suspension, and sessions
+  mixing iPhone and Android.
 
 ## 0.6.0 — 2026-11-04
 

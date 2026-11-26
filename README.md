@@ -566,6 +566,14 @@ get an invitation, join, open a local playback URL in the app's own player and f
 seek and rate. Any participant can control playback, and the session continues if the leading device leaves.
 Watch Together is **opt-in** and needs no new `Info.plist` key.
 
+- **Leave vs stop for everyone.** `session.leave()` takes only this device out (the others keep watching; if it
+  led, it hands the lead over at once). `session.end()` stops playback for everyone and can be called by any
+  participant; the others end with `.ended(.endedBy(participantId:name:))`, e.g. "Léa stopped playback". Offer
+  both actions in your UI.
+- **Several sessions nearby.** `WatchTogether.invitations` lists every nearby session in discovery order; show
+  them all (a list when there are several). `WatchTogetherInvitation.participantCount` gives the number of
+  devices in each (`nil` when unknown).
+
 ```swift
 import HopcastKit
 
@@ -593,9 +601,16 @@ final class HostController: WatchTogetherListener {
     }
 }
 
-// 3. Show invitations and join:
+// 3. Show every nearby invitation and join the one the user picks:
 try WatchTogether.setInvitationListener(banner)        // WatchTogetherInvitationListener
+for invitation in WatchTogether.invitations {          // discovery order
+    print(invitation.hostName, invitation.title, invitation.participantCount ?? 0)
+}
 let session = try WatchTogether.join(invitation, listener: guestController)
+
+// 4. Leave (only this device) or stop for everyone (any participant):
+session.leave()
+// session.end()   // the others get .ended(.endedBy(participantId:name:))
 ```
 
 Full guide with complete AVPlayer and VLCKit adapters, server streams and dashboard statistics:

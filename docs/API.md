@@ -358,7 +358,7 @@ public enum WatchTogether {
 | `setInvitationListener` | Starts (non-`nil`) or stops (`nil`) listening for nearby sessions. |
 | `join` | Joins a nearby session. Throws `invitationExpired` if the invitation is gone, `alreadyInSession`, or a gating error. |
 | `currentSession` | The session this device takes part in (one at a time), `nil` once it ended. |
-| `invitations` | Nearby sessions currently known. |
+| `invitations` | Every nearby session currently known, in discovery order. Show them all (a list when there are several). |
 
 ### 10.2 Sources, media and options
 
@@ -427,9 +427,13 @@ public final class WatchTogetherSession {
 - `play()`, `pause()`, `seek(to:)`, `setRate(_:)` apply **for everyone** and can be called by any participant.
 - `claimMaster()` takes the lead back (for example the original host returning).
 - `resumeAfterForeground()`: call it when the app becomes active again.
-- `leave()` leaves (the others keep watching); `end()` ends the session for everyone.
-- If the leading device leaves, locks or goes out of range, playback continues, the state is `.hostLost`, and
-  another participant takes the lead within seconds (`masterChanged`).
+- `leave()` takes only this device out; the others keep watching. If this device led, it names the next leader
+  on the way out: the others get `masterChanged` at once, with no `hostLost` and no grace period.
+- `end()` stops playback **for everyone** and can be called by any participant (host, lead or guest): the others
+  get `.ended(.endedBy(participantId:name:))`, this device `.ended(.left)`. Offer both actions in your UI
+  ("Leave" and "Stop for everyone").
+- If the leading device disappears without leaving (locked, crashed, out of range), playback continues, the
+  state is `.hostLost`, and another participant takes the lead within seconds (`masterChanged`).
 
 ### 10.4 Types, state and errors
 
@@ -437,6 +441,7 @@ public final class WatchTogetherSession {
 public struct WatchTogetherInvitation: Hashable {
     public let sessionId: String, hostName: String, hostEndpointId: String, title: String
     public let metadata: Data?, duration: TimeInterval?, isServerStream: Bool, sourceGroupId: String?
+    public let participantCount: Int?                     // devices in the session, nil when unknown
 }
 public struct WatchTogetherSessionInfo: Equatable {
     public let sessionId: String, title: String, contentType: String, size: Int64
@@ -453,7 +458,12 @@ public enum WatchTogetherState: Equatable {
     case preparing, active, hostLost, needsServerOrSamePlatformPeer
     case ended(WatchTogetherEndReason)
 }
-public enum WatchTogetherEndReason: Equatable { case left, endedByHost, sdkDisabled, failed(WatchTogetherError) }
+public enum WatchTogetherEndReason: Equatable {
+    case left                                             // leave() on this device
+    case endedBy(participantId: String, name: String)     // another participant called end()
+    case sdkDisabled
+    case failed(WatchTogetherError)
+}
 
 public enum WatchTogetherError: Error, Equatable {
     case notProvisioned, sdkDisabled, notEnabled, alreadyInSession
@@ -468,7 +478,7 @@ public enum WatchTogetherError: Error, Equatable {
 | `.active` | Playing together (or ready to). |
 | `.hostLost` | The leading device is unreachable; playback continues and another participant takes the lead shortly unless it returns. |
 | `.needsServerOrSamePlatformPeer` | This device cannot receive the media (no same-platform device nearby over a fast link, no HTTP origin enabled here). Playback control still works. |
-| `.ended(reason)` | Final. `.sdkDisabled`: the SDK key was revoked or the SDK released. |
+| `.ended(reason)` | Final. `.left`: `leave()` on this device. `.endedBy(participantId:name:)`: another participant (host, lead or guest) stopped playback for everyone with `end()`. `.sdkDisabled`: the SDK key was revoked or the SDK released. `.failed(error)`: the session could not continue. |
 
 Keep an `@unknown default` in `switch` statements over these public enums.
 
