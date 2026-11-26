@@ -1,12 +1,13 @@
-# Hopcast native SDKs 0.6.0 — public API reference
+# Hopcast native SDKs 0.7.0 — public API reference
 
-*iOS `HopcastKit` 0.6.0 · Android SDK 0.6.0 · released 2026-11-04.
+*iOS `HopcastKit` 0.7.0 · Android SDK 0.6.0 · Watch Together and the SDK key kill
+switch are iOS 0.7.0 additions: see § 10 and § 11.
 Integration guide (iOS): [README](../README.md#3-integration-guide). Migrating from iOS 0.4.1:
 [README § 4](../README.md#4-migrating-from-041).*
 
 ## 0. Contract
 
-- **Stable.** Every public name listed here is the 0.6.0 API. Patch releases (0.6.x) only add; they never rename,
+- **Stable.** Every public name listed here is the 0.7.0 API (iOS; Android 0.6.0). Patch releases (0.7.x) only add; they never rename,
   remove or change the meaning of an entry.
 - **No break from the previous public releases** (iOS 0.4.1, Android 0.5.2): every public declaration of those
   releases still exists with the same signature. Deprecations and behaviour changes: § 9.
@@ -308,3 +309,263 @@ liveness timeout.
   `transferFailed(invitationRejected)` (0.4.1 / 0.5.2: `cancelled` without reason); a recipient that disconnects
   during a send always gets `failed` + `transferFailed(peerDisconnected)`. Other recipients of a
   multi-recipient send continue.
+
+## 10. Watch Together (iOS `HopcastKit` 0.7.0)
+
+Nearby devices watch **one media in sync**. One device **hosts** a local file or an HTTP(S) stream; nearby
+devices get an **invitation**, **join**, open a local playback URL in the app's own player and follow the shared
+play, pause, seek and rate. Any participant can control playback. Everything is added in the `WatchTogether*`
+namespace plus one `Builder` flag; the 0.6.x API is unchanged. Full guide:
+<https://docs.hopcast.io/platforms/watch-together/>.
+
+- **Opt-in.** Off by default: `HopcastSDK.Builder.setWatchTogetherEnabled(_ enabled: Bool) -> HopcastSDK.Builder`
+  (set it on every launch, in the same `build()`). A device that does not enable it neither takes part in nor
+  announces sessions. No new `Info.plist` key.
+- **Gating** (first failing condition decides): SDK key revoked → `WatchTogetherError.sdkDisabled`; not
+  provisioned → `notProvisioned`; flag missing, SDK not built or `integrationError` set → `notEnabled`.
+  `WatchTogether.isAvailable` tells whether `host` and `join` can run now. The device-to-device engine must be
+  running (`startSharing(listener:)`).
+- **Threading.** Entry points and every callback are on the main thread.
+- **Automatic connections.** While a device hosts, takes part in or listens for sessions, the SDK connects to
+  nearby Watch Together devices by itself (`onIncomingConnectionRequest` is not called for them).
+
+### 10.1 Entry points
+
+```swift
+public enum WatchTogether {
+    public static let maxMetadataBytes: Int            // 16 * 1024
+    public static var isAvailable: Bool { get }
+    public static var currentSession: WatchTogetherSession? { get }
+    public static var invitations: [WatchTogetherInvitation] { get }
+
+    @discardableResult
+    public static func host(source: WatchTogetherSource, media: WatchTogetherMedia,
+                            options: WatchTogetherOptions = WatchTogetherOptions(),
+                            listener: WatchTogetherListener?) throws -> WatchTogetherSession
+
+    public static func setInvitationListener(_ listener: WatchTogetherInvitationListener?) throws
+
+    @discardableResult
+    public static func join(_ invitation: WatchTogetherInvitation,
+                            options: WatchTogetherOptions = WatchTogetherOptions(),
+                            listener: WatchTogetherListener?) throws -> WatchTogetherSession
+}
+```
+
+| Member | Behaviour |
+|---|---|
+| `host` | Starts a session from this device; the session is `.preparing` until the playback URL is ready. `.file` is checked immediately (`fileNotFound`, `emptyFile`); an `.http` origin is checked before the session is announced (failure: `.ended(.failed(.sourceUnreachable))` / `.rangeNotSupported`). Throws `alreadyInSession`, `metadataTooLarge` and the gating errors. Listeners are held weakly. |
+| `setInvitationListener` | Starts (non-`nil`) or stops (`nil`) listening for nearby sessions. |
+| `join` | Joins a nearby session. Throws `invitationExpired` if the invitation is gone, `alreadyInSession`, or a gating error. |
+| `currentSession` | The session this device takes part in (one at a time), `nil` once it ended. |
+| `invitations` | Nearby sessions currently known. |
+
+### 10.2 Sources, media and options
+
+```swift
+public enum WatchTogetherSource { case file(URL); case http(WatchTogetherHTTPSource) }
+
+public struct WatchTogetherHTTPSource {
+    public var url: URL                      // must honour byte ranges (206 Partial Content)
+    public var headers: [String: String]     // sent only to this origin, never shared, never logged
+    public var sourceGroupId: String?        // same value = devices may share the download; nil = private
+    public init(url: URL, headers: [String: String] = [:], sourceGroupId: String? = nil)
+}
+
+public struct WatchTogetherMedia {
+    public var title: String
+    public var duration: TimeInterval?
+    public var contentType: String?          // nil: derived from the file extension
+    public var metadata: Data?               // opaque app payload, <= WatchTogether.maxMetadataBytes
+    public init(title: String, duration: TimeInterval? = nil, contentType: String? = nil, metadata: Data? = nil)
+}
+
+public struct WatchTogetherOptions {
+    public var cacheDirectory: URL?          // default: the app's Caches
+    public var keepCacheOnEnd: Bool          // default false
+    public var serverSource: ((WatchTogetherSessionInfo) -> WatchTogetherHTTPSource?)?
+    public var probesUnknownDevices: Bool    // default true
+    public init()
+}
+```
+
+`serverSource` lets a guest of a server stream use **its own** URL and credentials for the same media (return
+`nil` to rely on nearby devices only); it has the same effect as `WatchTogetherSession.enableServerSource`.
+
+### 10.3 The session
+
+```swift
+public final class WatchTogetherSession {
+    public let sessionId: String
+    public let role: WatchTogetherRole                    // .host / .guest
+    public weak var listener: WatchTogetherListener?
+    public var state: WatchTogetherState { get }
+    public var isMaster: Bool { get }                     // this device currently leads playback
+    public var playbackURL: URL? { get }                  // local URL for the player, valid for this session only
+    public var info: WatchTogetherSessionInfo? { get }
+    public var participants: [WatchTogetherParticipant] { get }
+    public var counters: WatchTogetherByteCounters { get }
+    public var stats: WatchTogetherStats { get }
+
+    public func attach(player: PlayerClock)
+    public func detach()
+    public func play()
+    public func pause()
+    public func seek(to seconds: TimeInterval)
+    public func setRate(_ rate: Float)                    // 0 < rate <= 4
+    public func enableServerSource(_ source: WatchTogetherHTTPSource,
+                                   completion: ((WatchTogetherError?) -> Void)? = nil)
+    public func claimMaster()
+    public func resumeAfterForeground()
+    public func leave()
+    public func end()
+}
+```
+
+- Open `playbackURL` in the player first, then `attach(player:)`: the session drives play, pause, seek and small
+  rate corrections.
+- `play()`, `pause()`, `seek(to:)`, `setRate(_:)` apply **for everyone** and can be called by any participant.
+- `claimMaster()` takes the lead back (for example the original host returning).
+- `resumeAfterForeground()`: call it when the app becomes active again.
+- `leave()` leaves (the others keep watching); `end()` ends the session for everyone.
+- If the leading device leaves, locks or goes out of range, playback continues, the state is `.hostLost`, and
+  another participant takes the lead within seconds (`masterChanged`).
+
+### 10.4 Types, state and errors
+
+```swift
+public struct WatchTogetherInvitation: Hashable {
+    public let sessionId: String, hostName: String, hostEndpointId: String, title: String
+    public let metadata: Data?, duration: TimeInterval?, isServerStream: Bool, sourceGroupId: String?
+}
+public struct WatchTogetherSessionInfo: Equatable {
+    public let sessionId: String, title: String, contentType: String, size: Int64
+    public let metadata: Data?, duration: TimeInterval?, isServerStream: Bool, sourceGroupId: String?
+}
+public struct WatchTogetherParticipant: Hashable {
+    public let id: String, name: String
+    public let isLocal: Bool, isHost: Bool, isMaster: Bool, isConnected: Bool, isServerCapable: Bool
+    public let progress: Double?                          // share of the media held, 0...1
+}
+public enum WatchTogetherRole: Equatable { case host, guest }
+
+public enum WatchTogetherState: Equatable {
+    case preparing, active, hostLost, needsServerOrSamePlatformPeer
+    case ended(WatchTogetherEndReason)
+}
+public enum WatchTogetherEndReason: Equatable { case left, endedByHost, sdkDisabled, failed(WatchTogetherError) }
+
+public enum WatchTogetherError: Error, Equatable {
+    case notProvisioned, sdkDisabled, notEnabled, alreadyInSession
+    case fileNotFound, emptyFile, sourceUnreachable, rangeNotSupported, sizeMismatch
+    case invitationExpired, wrongRole, storage, metadataTooLarge
+}
+```
+
+| State | Meaning |
+|---|---|
+| `.preparing` | Host: checking the source. Guest: joining. |
+| `.active` | Playing together (or ready to). |
+| `.hostLost` | The leading device is unreachable; playback continues and another participant takes the lead shortly unless it returns. |
+| `.needsServerOrSamePlatformPeer` | This device cannot receive the media (no same-platform device nearby over a fast link, no HTTP origin enabled here). Playback control still works. |
+| `.ended(reason)` | Final. `.sdkDisabled`: the SDK key was revoked or the SDK released. |
+
+Keep an `@unknown default` in `switch` statements over these public enums.
+
+### 10.5 Player integration
+
+```swift
+public protocol PlayerClock: AnyObject {
+    var currentTime: TimeInterval { get }
+    var isPlaying: Bool { get }
+    var isBuffering: Bool { get }          // default implementation: false
+    func play()
+    func pause()
+    func seek(to seconds: TimeInterval)
+    func setRate(_ rate: Float)
+}
+
+public final class WatchTogetherCoarseClock {
+    public init()
+    public func report(_ seconds: TimeInterval)
+    public func setPlaying(_ playing: Bool)
+    public func setRate(_ rate: Double)
+    public func didSeek(to seconds: TimeInterval)
+    public var currentTime: TimeInterval { get }
+    public var isStalled: Bool { get }
+}
+```
+
+`PlayerClock` is called on the main thread. `setRate` is used for small corrections **while playing** and must
+not change the play/pause state. `WatchTogetherCoarseClock` smooths players that report their time a few times
+per second (such as VLCKit): feed it every report and read `currentTime` from your `PlayerClock`.
+
+### 10.6 Listeners and events
+
+```swift
+public protocol WatchTogetherListener: AnyObject {
+    func onStateChanged(_ session: WatchTogetherSession, state: WatchTogetherState)
+    func onPlaybackURLReady(_ session: WatchTogetherSession, url: URL)
+    func onSessionInfo(_ session: WatchTogetherSession, info: WatchTogetherSessionInfo)
+    func onParticipantsChanged(_ session: WatchTogetherSession, participants: [WatchTogetherParticipant])
+    func onEvent(_ session: WatchTogetherSession, event: WatchTogetherEvent)
+}
+
+public protocol WatchTogetherInvitationListener: AnyObject {
+    func onInvitation(_ invitation: WatchTogetherInvitation)
+    func onInvitationWithdrawn(_ invitation: WatchTogetherInvitation)
+}
+
+public enum WatchTogetherEvent: Equatable {
+    case participantJoined(id: String, name: String)
+    case participantLeft(id: String)
+    case hostLost, hostRecovered
+    case masterChanged(participantId: String, isLocal: Bool)
+    case stalled(seconds: Double)
+    case resynced
+    case serverSourceEnabled
+    case serverSourceFailed(WatchTogetherError)
+    case complete                                  // this device holds the whole media
+}
+```
+
+Every listener method has an empty default implementation and is called on the main thread.
+
+### 10.7 Counters and statistics
+
+`WatchTogetherSession.counters` returns `WatchTogetherByteCounters` (`peerReceived`, `peerSent`,
+`serverReceived`: bytes moved by this device since the session started). `WatchTogetherSession.stats` returns a
+`WatchTogetherStats` for a dashboard, refreshed regularly: `time`, `participants: [WatchTogetherPeerStats]` (per
+participant: `partsHeld`, `bufferedAhead`, `position`, `isPlaying`, `driftMs`, `stalls`, `bytes`, `departed`,
+`progress`) and `flows: [WatchTogetherFlow]` (bytes and bits per second from one participant, or from
+`WatchTogetherFlow.originId` for the HTTP origin, to another).
+
+### 10.8 Limits
+
+- Media data moves between devices only over fast local links; a device reachable only over Bluetooth gets
+  playback control but no media.
+- Mixed iPhone / Android sessions: each platform needs one device with server access to the media or a
+  same-platform device that holds it.
+- One session per device at a time. Sources: a local file, or an HTTP(S) origin that honours byte ranges.
+
+## 11. SDK key kill switch (iOS `HopcastKit` 0.7.0)
+
+When the backend revokes the SDK key embedded in a build, the SDK shuts down for good: every public API becomes
+a silent no-op, its credentials are purged, the local reporting queue is kept and the app is notified once.
+
+```swift
+public enum SdkDisabledReason: String, Equatable, Sendable { case sdkKeyRevoked }
+
+public protocol SdkDisabledListener: AnyObject {
+    func onSdkDisabled(reason: SdkDisabledReason)         // main thread, once
+}
+
+HopcastSDK.isDisabled                                      // Bool
+HopcastSDK.setSdkDisabledListener(_ listener: SdkDisabledListener?)   // set before build()
+HopcastIdentityError.sdkDisabled                           // returned by provision with a revoked key
+```
+
+A build that ships a **new** SDK key brings the SDK back through `provision(sdkKey:userId:completion:)`. The
+notification is not replayed when the process starts already disabled: read `isDisabled`. An expired token is
+refreshed at SDK start and when connectivity returns, so a revoked device that touches the network is shut down
+within about 24 hours.

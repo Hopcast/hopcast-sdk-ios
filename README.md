@@ -6,9 +6,19 @@ servers. The SDK picks the link by itself: **Bluetooth LE** for discovery, wake-
 messages and small files, and **peer-to-peer Wi-Fi** (Network.framework / AWDL) for large
 files between iPhones. It keeps working **in the background, with the screen locked and
 after iOS terminated your app**, and talks to Android phones running the Hopcast Android
-SDK 0.6.0. On top of this device-to-device layer, an optional **online mode** lets the
+SDK 0.6.0. iOS 0.7.0 adds **Watch Together**: nearby devices watch one media in sync. On top of this device-to-device layer, an optional **online mode** lets the
 Hopcast cloud match devices that *have* a content with devices that *need* it, and
 trigger the transfer automatically. Every exchange is reported to your Hopcast dashboard.
+
+**What's new in 0.7.0**
+
+- **Watch Together.** Nearby devices watch **one media in sync**: one device hosts a local file or an
+  HTTP(S) stream, nearby devices get an invitation, join and follow the shared play, pause, seek and
+  rate in the app's own player (AVPlayer, VLCKit, any player through `PlayerClock`). Opt-in with
+  `Builder.setWatchTogetherEnabled(true)`; see [Watch Together](#312-watch-together-070).
+- **SDK key kill switch.** `HopcastSDK.isDisabled`, `setSdkDisabledListener(_:)`, `SdkDisabledReason`,
+  `HopcastIdentityError.sdkDisabled` (planned for 0.6.1, shipped with 0.7.0).
+- **The 0.6.x API is unchanged**, no new `Info.plist` key. See [CHANGELOG.md](CHANGELOG.md).
 
 **What's new in 0.6.0**
 
@@ -549,6 +559,48 @@ timer). When a peer's app is relaunched, its stale entry disappears within ~3 s.
 HopcastSDK.release()    // tears everything down (also clears integrationError); rebuild with the builder to use again
 ```
 
+### 3.12 Watch Together (0.7.0)
+
+Nearby devices watch **one media in sync**. One device hosts a local file or an HTTP(S) stream; nearby devices
+get an invitation, join, open a local playback URL in the app's own player and follow the shared play, pause,
+seek and rate. Any participant can control playback, and the session continues if the leading device leaves.
+Watch Together is **opt-in** and needs no new `Info.plist` key.
+
+```swift
+import HopcastKit
+
+// 1. At every launch, in the same build() as the rest:
+HopcastSDK.builder(deviceId: "Alice", cacheDirectory: cache)
+    .setServiceId("myservice")
+    .setWatchTogetherEnabled(true)            // opt-in
+    .build()
+
+// 2. Host a local file (the device must be provisioned and sharing):
+final class HostController: WatchTogetherListener {
+    private(set) var session: WatchTogetherSession?
+
+    func startHosting(file: URL) {
+        let media = WatchTogetherMedia(title: "Holiday video", duration: 5_400, contentType: "video/mp4")
+        do {
+            session = try WatchTogether.host(source: .file(file), media: media, listener: self)
+        } catch {
+            print("cannot host: \(error)")      // notProvisioned, notEnabled, fileNotFound, ...
+        }
+    }
+
+    func onPlaybackURLReady(_ session: WatchTogetherSession, url: URL) {
+        // Open `url` in your player, then session.attach(player:) with a PlayerClock adapter.
+    }
+}
+
+// 3. Show invitations and join:
+try WatchTogether.setInvitationListener(banner)        // WatchTogetherInvitationListener
+let session = try WatchTogether.join(invitation, listener: guestController)
+```
+
+Full guide with complete AVPlayer and VLCKit adapters, server streams and dashboard statistics:
+<https://docs.hopcast.io/platforms/watch-together/>. Reference: [docs/API.md § 10](docs/API.md#10-watch-together-ios-hopcastkit-070).
+
 ---
 
 ## 4. Migrating from 0.4.1
@@ -595,6 +647,8 @@ Full reference: [docs/API.md](docs/API.md).
 | Sending | `trySendFiles(endpointIds:files:metadata:)`, `sendFiles(endpointIds:files:metadata:)`, `sendBytes(endpointIds:bytes:)`, `acceptTransfer(transferId:)`, `rejectTransfer(transferId:)`, `cancelTransfer(transferId:)` |
 | Online | `reportDownloadedFile(infraType:contentIds:)`, `reportRemovedFile(contentIds:)`, `declareNeed(contentId:ttlSeconds:)`, `cancelNeed(needId:)`, `handleFcmToken(_:)`, `handleFcmMessage(_:)` |
 | Listeners | `setDeviceDiscoveryListener`, `setConnectionListener`, `setTransferListener`, `setPendingPayloadListener`, `setPeerLinksListener`, `setOnAppBytesReceivedListener`, `setOnlineEventListener`, `setTransferHandoffListener` (+ matching `remove…` calls) |
+| Watch Together (0.7.0) | `Builder.setWatchTogetherEnabled(_:)`, `WatchTogether.host(source:media:options:listener:)`, `join(_:options:listener:)`, `setInvitationListener(_:)`, `WatchTogetherSession`, `PlayerClock` |
+| Kill switch (0.7.0) | `isDisabled`, `setSdkDisabledListener(_:)`, `SdkDisabledReason` |
 | Misc | `release()` |
 
 ---

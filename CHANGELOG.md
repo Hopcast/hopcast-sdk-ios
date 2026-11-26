@@ -1,5 +1,68 @@
 # Changelog
 
+## 0.7.0 — 2026-11-TBD
+
+### Highlights
+
+- **Watch Together.** Nearby devices watch **one media in sync**. One device hosts a local file or an HTTP(S)
+  stream; nearby devices get an invitation ("Alice is watching *Movie* — Join"), join, open a local playback
+  URL in the app's own player and follow the shared play, pause, seek and rate. Any participant can control
+  playback.
+- **The media is shared between nearby devices.** For a server stream, the origin is downloaded about once for
+  the whole group; for a local file, guests receive copies from nearby devices. Received media is checked for
+  corruption.
+- **The session survives the leading device.** If the device that leads playback leaves, locks or goes out of
+  range, playback continues and another participant takes the lead within seconds. The original host can come
+  back and take the lead again.
+- **Credentials stay on the device.** HTTP headers given for an origin are sent only to that origin, never to
+  other participants, never logged. Each guest can use its own URL and credentials for the same media.
+- **Player-agnostic.** `PlayerClock` drives AVPlayer, VLCKit or any other player; `WatchTogetherCoarseClock`
+  smooths players that report their time coarsely.
+- **Dashboard and energy accounting.** `session.stats` and `session.counters`.
+- **Opt-in.** Off by default; enable it with `HopcastSDK.Builder.setWatchTogetherEnabled(true)`. Requires
+  provisioning.
+- **Also ships the SDK key kill switch (planned 0.6.1, never published separately).** When the backend revokes
+  the SDK key, the SDK shuts down for good, purges its credentials and notifies the app once. New:
+  `HopcastSDK.isDisabled`, `HopcastSDK.setSdkDisabledListener(_:)`, `SdkDisabledReason`,
+  `HopcastIdentityError.sdkDisabled`. A build shipping a new SDK key brings the SDK back through `provision`.
+
+### API additions
+
+New, namespaced `WatchTogether*`: `WatchTogether` (`host`, `join`, `setInvitationListener`, `invitations`,
+`currentSession`, `isAvailable`), `WatchTogetherSession`, `WatchTogetherSource` / `WatchTogetherHTTPSource`,
+`WatchTogetherMedia`, `WatchTogetherOptions`, `WatchTogetherInvitation`, `WatchTogetherSessionInfo`,
+`WatchTogetherParticipant`, `WatchTogetherState`, `WatchTogetherEndReason`, `WatchTogetherError`,
+`WatchTogetherEvent`, `WatchTogetherListener`, `WatchTogetherInvitationListener`, `PlayerClock`,
+`WatchTogetherCoarseClock`, `WatchTogetherByteCounters`, `WatchTogetherPeerStats`, `WatchTogetherFlow`,
+`WatchTogetherStats`, `HopcastSDK.Builder.setWatchTogetherEnabled(_:)`. Kill switch: `HopcastSDK.isDisabled`,
+`setSdkDisabledListener(_:)`, `SdkDisabledListener`, `SdkDisabledReason`, `HopcastIdentityError.sdkDisabled`.
+Reference: [docs/API.md](docs/API.md) § 10.
+
+### Compatibility
+
+- **The 0.6.x API is unchanged**: no declaration was removed or changed. An app that does not call
+  `setWatchTogetherEnabled(true)` behaves exactly as on 0.6.x, and the device does not take part in nor announce
+  Watch Together.
+- **No new `Info.plist` key.** The 0.6.0 requirements (Bluetooth, local network, Bonjour service, background
+  modes) are enough.
+- Devices on 0.6.x keep exchanging files and messages with 0.7.0 devices as before; they do not take part in
+  Watch Together sessions.
+- While a device hosts, takes part in or listens for Watch Together sessions, the SDK connects to nearby Watch
+  Together devices automatically.
+- Public enums are not frozen: keep `@unknown default`.
+
+### Known limits
+
+- **Data between devices only over fast local links.** A device reachable only over Bluetooth gets playback
+  control but no media.
+- **Mixed iPhone / Android sessions**: each platform needs one device with server access to the media or a
+  same-platform device that holds it. Playback control works across platforms.
+- One session per device at a time. Sources: a local file, or an HTTP(S) origin that honours byte ranges.
+- Watch Together is a foreground feature: call `resumeAfterForeground()` when the app becomes active again.
+- Validated on simulators and on two real iPhones (local file, pause / resume / seek, host leaving, shared
+  server stream). Not yet validated on real devices: more than two devices, long background suspension, and
+  sessions mixing iPhone and Android.
+
 ## 0.6.0 — 2026-11-04
 
 ### Highlights
